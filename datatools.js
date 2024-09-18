@@ -19,7 +19,7 @@ class DataTools {
         await this.loadData()
       
         if (this.filters && Array.isArray(this.data)) {
-            console.log(`Resulting dataset: ${this.data.length} records.`)
+            // console.log(`Resulting dataset: ${this.data.length} records.`)
             
         } else {
             // Calculate Jenks natural breaks for downloads and likes
@@ -120,17 +120,17 @@ class DataTools {
             for (const file of files) {
                 if (file.endsWith('.json')) {
                     const filePath = path.join(this.folderPath, file);
-                    console.log(`Processing file: ${filePath}`);
+                    // console.log(`Processing file: ${filePath}`);
     
                     // Read file content asynchronously
                     const data = JSON.parse(await fs.readFile(filePath, 'utf8'));
-                    console.log(`Total entries in ${file}: ${data.length}`);
+                    // console.log(`Total entries in ${file}: ${data.length}`);
     
                     // Process data in chunks to avoid memory issues
                     const chunkSize = 1000; // Adjust chunk size as needed
                     for (let i = 0; i < data.length; i += chunkSize) {
                         const chunk = data.slice(i, i + chunkSize);
-                        console.log(`Chunk ${i/chunkSize} of ${Math.trunc(data.length/chunkSize)}`)
+                        // console.log(`Chunk ${i/chunkSize} of ${Math.trunc(data.length/chunkSize)}`)
                         switch (this.action) {
                             case 'datavis':
                                 await this.getFilteredData(chunk);
@@ -365,7 +365,7 @@ class DataTools {
         const totalDatasets = this.data.length;
 
         for (let item of this.data) { // iterate over datasets (links)
-            console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
+            // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
 
             let targets = this.extractTagValues(item.tags, this.filters.source === 'dataset' ? this.filters.target : this.filters.source) // extract values for target
             let links = this.extractTagValues(item.tags, this.filters.link)
@@ -411,7 +411,7 @@ class DataTools {
         let currentItemNumber = 1;
         const totalDatasets = this.data.length;
         for (let item of this.data) { // iterate over datasets (links)
-            console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
+            // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
 
             let sources = this.extractTagValues(item.tags, this.filters.source) // extract values for source 
             let targets = this.extractTagValues(item.tags, this.filters.target) // extract values for target
@@ -493,7 +493,7 @@ class DataTools {
         for (const key of Object.keys(itemsDict)) { 
             const itemList = itemsDict[key]
             const arraySize = itemList.length;
-            console.log(`Processing task ${key} (${currentTaskNumber}/${totalTasks}). Array size: ${arraySize}`);
+            // console.log(`Processing task ${key} (${currentTaskNumber}/${totalTasks}). Array size: ${arraySize}`);
 
             let authors = itemList.map(d => {
                 let dt = this.data.find(e => e._id === d); 

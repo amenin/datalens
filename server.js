@@ -23,7 +23,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const prefix = '/mgnlp'
+const prefix = '/datalens'
 
 app.use(prefix, express.static(path.join(__dirname, 'public')))
 
@@ -32,6 +32,10 @@ app.use(prefix + '/node_modules', express.static(path.join(__dirname, 'node_modu
 
 
 app.get(prefix, (req, res) => {
+    res.render('about')
+})
+
+app.get(prefix + '/explorer', (req, res) => {
     res.render('index')
 })
 
@@ -40,7 +44,7 @@ app.post(prefix + '/data/:action', async (req, res) => {
 
     const folderPath = 'data/modality_datasets';
     const dataTools = new DataTools(folderPath);
-    console.log(filters)
+    // console.log(filters)
    
     let filterPath = path.join(__dirname, 'data/filters.json')
     let result;
@@ -49,9 +53,9 @@ app.post(prefix + '/data/:action', async (req, res) => {
     } else {
         let cachefile = `data/cache/${dataTools.getFilterHash(filters)}.json`
         if (fs.existsSync(path.join(__dirname, cachefile))) {
-            console.log(`Loading cache file ${cachefile}`)
+            // console.log(`Loading cache file ${cachefile}`)
             result = fs.readFileSync(path.join(__dirname, cachefile))
-            console.log(`Dataset has ${result.data.length} entries.`)
+            // console.log(`Dataset has ${result.data.length} entries.`)
         } else {        
             await dataTools.init(req.params.action, filters)
             result = await dataTools.getData()

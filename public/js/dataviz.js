@@ -23,8 +23,7 @@ class DataViz{
         console.log(result)
         if (result.message) {
             this.togglePlaceholder(`<i class="fa-solid fa-triangle-exclamation alert-icon" ></i><br> ${result.message}`)
-        }
-        else if (!result.data.length) {
+        } else if (!result.data.length) {
             this.togglePlaceholder("The current filters do not match any data.")
         } else { 
             if (!result.data[0].date)
@@ -68,7 +67,7 @@ class DataViz{
     async fetchData(filters) {
    
         try {
-            const response = await fetch('/mgnlp/data/datavis', {
+            const response = await fetch('/datalens/data/datavis', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -323,7 +323,7 @@ class FilterPanel {
 
     async fetchData() {
         try {
-            const response = await fetch('/mgnlp/data/filters', {
+            const response = await fetch('/datalens/data/filters', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
