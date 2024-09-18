@@ -73,15 +73,15 @@ app.post(prefix + '/data/:action', async (req, res) => {
 });
 
 
-const port = 8010 // verify the availability of this port on the server
-const portHTTPS = 8013
+const port = 8015 // verify the availability of this port on the server
+const portHTTPS = 8017
 
 app.listen(port, async () => { console.log(`HTTP Server started at port ${port}.`) })
 
 try {
-    var privateKey = fs.readFileSync( '/etc/httpd/certificate/exp_20240906/dataviz_i3s_unice_fr.key' );
-    var certificate = fs.readFileSync( '/etc/httpd/certificate/exp_20240906/dataviz_i3s_unice_fr_cert.crt' );
-    var ca = fs.readFileSync( '/etc/httpd/certificate/exp_20240906/dataviz_i3s_unice_fr_AC.cer' );
+    var privateKey = fs.readFileSync( '/etc/httpd/certificate/exp_20250808/dataviz_i3s_unice_fr.key' );
+    var certificate = fs.readFileSync( '/etc/httpd/certificate/exp_20250808/dataviz_i3s_unice_fr_cert.crt' );
+    var ca = fs.readFileSync( '/etc/httpd/certificate/exp_20250808/dataviz_i3s_unice_fr_AC.cer' );
     var options = {key: privateKey, cert: certificate, ca: ca};
     https.createServer( options, function(req,res)
     {
