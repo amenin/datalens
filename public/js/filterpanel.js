@@ -296,7 +296,7 @@ class FilterPanel {
     }
 
     async setNetworkOptions() {
-        let variables = ['dataset', 'task_categories', 'task_id', 'modality', 'license', 'format', 'language', 'model']
+        let variables = ['dataset', 'task_categories', 'task_id', 'modality', 'license', 'format', 'language']
 
         this.setSelect(variables, '#source-select', 'task_categories')
         this.setSelect(variables, '#target-select', 'task_categories')

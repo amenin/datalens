@@ -419,7 +419,7 @@ class DataTools {
         const totalDatasets = this.data.length;
         try {
             for (let item of this.data) { // iterate over datasets (links)
-                console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
+                // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
 
                 let sources = this.extractTagValues(item.tags, this.filters.source) // extract values for source 
                 let targets = this.extractTagValues(item.tags, this.filters.target) // extract values for target
@@ -432,8 +432,6 @@ class DataTools {
 
                 for (let i = 0; i < sources.length; i++) {
                     for (let j = 0; j < targets.length; j++) {
-
-                        if (sources[i] === targets[j]) continue
                         
                         const value = {
                             p: { value: item.id },
