@@ -80,10 +80,6 @@ class DataTools {
         return hash.digest('hex'); // Returns the hash as a hexadecimal string
     }
 
-    getFilename(){
-        return `data/cache/${this.getFilterHash(this.filters)}.json`
-    }
-
     async getData() {
         if (this.action === 'datavis') {
             let cachePath = '/data/cache'
@@ -98,7 +94,7 @@ class DataTools {
             else if (this.filters.source === 'dataset' || this.filters.target === 'dataset')
                 data = await this.datasetAsNode()
 
-            let filename = this.getFilename()
+            let filename = `data/cache/${this.getFilterHash(this.filters)}.json`
             try {
                 await fs.writeFile(path.join(__dirname, filename), JSON.stringify(data, null, 4))
             } catch (e) {
