@@ -83,7 +83,8 @@ class DataViz{
             return await response.json()
     
         } catch (error) {
-            console.error('Error fetching data:', error);
+            this.togglePlaceholder(`Error fetching the data: ${error}. <br>Please try again later.`)
+            //console.error('Error fetching data:', error);
         }
     
         return

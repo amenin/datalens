@@ -246,7 +246,7 @@ class FilterPanel {
                 const languageName = new Intl.DisplayNames(['en'], { type: 'language' });
                 return `${languageName.of(code)} (${code})` || `Unknown (${code})`;
             } catch (error) {
-                console.log('Error fetching language name:', error);
+                //console.log('Error fetching language name:', error);
                 return `Unknown (${code})`;
             }
         }
@@ -296,7 +296,7 @@ class FilterPanel {
     }
 
     async setNetworkOptions() {
-        let variables = ['dataset', 'task_categories', 'task_id', 'modality', 'license', 'format', 'language']
+        let variables = ['dataset', 'task_categories', 'task_id', 'modality', 'license', 'format', 'language', 'model']
 
         this.setSelect(variables, '#source-select', 'task_categories')
         this.setSelect(variables, '#target-select', 'task_categories')

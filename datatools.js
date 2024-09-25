@@ -9,7 +9,7 @@ class DataTools {
         this.folderPath = folderPath;
         this.data;
 
-        this.invalidKeys = ['description', 'citation', 'sha', 'private', 'disabled', 'downloads_all_time', 'id',  'paperswithcode_id', 'region', 'card_data', 'siblings', 'cardData', '_id', 'key', 'arxiv', 'doi', 'icelandic',  'Norwegian wikipedia scraped with links from nowiki dump', 'author', 'lastModified', 'gated', 'library', 'annotations_creators', 'language_creators', 'source_datasets', 'benchmark', 'multilinguality']
+        this.invalidKeys = ['description', 'citation', 'sha', 'private', 'disabled', 'downloads_all_time', 'id',  'paperswithcode_id', 'region', 'card_data', 'siblings', 'cardData', '_id', 'key', 'arxiv', 'doi', 'icelandic',  'Norwegian wikipedia scraped with links from nowiki dump', 'author', 'lastModified', 'gated', 'library', 'annotations_creators', 'language_creators', 'source_datasets', 'benchmark', 'multilinguality', 'ai-tube']
     }
 
     async init(action, filters) {
@@ -80,6 +80,9 @@ class DataTools {
         return hash.digest('hex'); // Returns the hash as a hexadecimal string
     }
 
+    getFilename(){
+        return `data/cache/${this.getFilterHash(this.filters)}.json`
+    }
 
     async getData() {
         if (this.action === 'datavis') {
@@ -95,7 +98,7 @@ class DataTools {
             else if (this.filters.source === 'dataset' || this.filters.target === 'dataset')
                 data = await this.datasetAsNode()
 
-            let filename = `data/cache/${this.getFilterHash(this.filters)}.json`
+            let filename = this.getFilename()
             try {
                 await fs.writeFile(path.join(__dirname, filename), JSON.stringify(data, null, 4))
             } catch (e) {
@@ -364,41 +367,45 @@ class DataTools {
         let currentItemNumber = 1;
         const totalDatasets = this.data.length;
 
-        for (let item of this.data) { // iterate over datasets (links)
-            // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
+        try {
+            for (let item of this.data) { // iterate over datasets (links)
+                // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
 
-            let targets = this.extractTagValues(item.tags, this.filters.source === 'dataset' ? this.filters.target : this.filters.source) // extract values for target
-            let links = this.extractTagValues(item.tags, this.filters.link)
+                let targets = this.extractTagValues(item.tags, this.filters.source === 'dataset' ? this.filters.target : this.filters.source) // extract values for target
+                let links = this.extractTagValues(item.tags, this.filters.link)
 
-            let type = this.extractTagValues(item.tags, this.filters.theme)[0] // extract values for theme (?type)
-            if (type && type === 'unknown')
-                type = null
+                let type = this.extractTagValues(item.tags, this.filters.theme)[0] // extract values for theme (?type)
+                if (type && type === 'unknown')
+                    type = null
 
-            for (let link of links) {
-                for (let target of targets) {
-                    const value = {
-                        p: { value: link },
-                        s: { value: item.id },
-                        o: { value: target },
-                        label: { value: link },
-                        style1: { value: 'fst' },
-                        style2: { value: 'snd' }    
-                    }     
+                for (let link of links) {
+                    for (let target of targets) {
+                        const value = {
+                            p: { value: link },
+                            s: { value: item.id },
+                            o: { value: target },
+                            label: { value: link },
+                            style1: { value: 'fst' },
+                            style2: { value: 'snd' }    
+                        }     
 
-                    network.push(value)
+                        network.push(value)
+                    }
                 }
+
+            }   
+
+            let stylesheet = this.getStylesheet()
+            delete stylesheet['services']
+
+            stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} and ${this.prettyTitle(this.filters.target)} based on shared ${this.prettyTitle(this.filters.link)}`   
+
+            return {
+                data: network,
+                stylesheet: stylesheet
             }
-
-        }   
-
-        let stylesheet = this.getStylesheet()
-        delete stylesheet['services']
-
-        stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} and ${this.prettyTitle(this.filters.target)} based on shared ${this.prettyTitle(this.filters.link)}`   
-
-        return {
-            data: network,
-            stylesheet: stylesheet
+        } catch(e) {
+            return { message: `Data processing failed with error: ${e.message}`}
         }
 
     }
@@ -410,54 +417,60 @@ class DataTools {
 
         let currentItemNumber = 1;
         const totalDatasets = this.data.length;
-        for (let item of this.data) { // iterate over datasets (links)
-            // console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
+        try {
+            for (let item of this.data) { // iterate over datasets (links)
+                console.log(`Processing dataset ${item.id} (${currentItemNumber}/${totalDatasets}).`);
 
-            let sources = this.extractTagValues(item.tags, this.filters.source) // extract values for source 
-            let targets = this.extractTagValues(item.tags, this.filters.target) // extract values for target
-            
+                let sources = this.extractTagValues(item.tags, this.filters.source) // extract values for source 
+                let targets = this.extractTagValues(item.tags, this.filters.target) // extract values for target
 
-            let type = this.extractTagValues(item.tags, this.filters.theme)[0] // extract values for theme (?type)
-            if (type && type === 'unknown')
-                type = null
+                let type = this.extractTagValues(item.tags, this.filters.theme)[0] // extract values for theme (?type)
+                if (type && type === 'unknown')
+                    type = null
 
-            let size = this.extractTagValues(item.tags, 'size_categories')[0] // only for completing the label
+                let size = this.extractTagValues(item.tags, 'size_categories')[0] // only for completing the label
 
-            for (let i = 0; i < sources.length; i++) {
-                for (let j = 0; j < targets.length; j++) {
-                    
-                    const value = {
-                        p: { value: item.id },
-                        s: { value: sources[i] },
-                        o: { value: targets[j] },
-                        url: { value: `https://huggingface.co/datasets/${item.id}`},
-                        label: { value: `${item.id} ${size ? '(' + size + ')' : ''}`},
-                        date: { value: item.last_modified },
-                        authorList: { value: `Author: ${item.author}. Description: ${item.description}` },
-                        type: { value: type }
+                for (let i = 0; i < sources.length; i++) {
+                    for (let j = 0; j < targets.length; j++) {
+
+                        if (sources[i] === targets[j]) continue
+                        
+                        const value = {
+                            p: { value: item.id },
+                            s: { value: sources[i] },
+                            o: { value: targets[j] },
+                            url: { value: `https://huggingface.co/datasets/${item.id}`},
+                            label: { value: `${item.id} ${size ? '(' + size + ')' : ''}`},
+                            date: { value: item.last_modified },
+                            authorList: { value: `Author: ${item.author}. Description: ${item.description}` },
+                            type: { value: type }
+                        }
+
+                        if (this.filters.source !== this.filters.target) {
+                            value.style1 = { value: 'fst' }
+                            value.style2 = { value: 'snd' }
+                        }
+
+                        network.push(value)
+                        
                     }
-
-                    if (this.filters.source !== this.filters.target) {
-                        value.style1 = { value: 'fst' }
-                        value.style2 = { value: 'snd' }
-                    }
-
-                    network.push(value)
                 }
+
+                currentItemNumber++;
             }
 
-            currentItemNumber++;
-        }
+            let stylesheet = this.getStylesheet()
+            delete stylesheet['services']
+            if (this.filters.source === this.filters.target)
+                stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} based on shared datasets`
+            else  stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} and ${this.prettyTitle(this.filters.target)} based on shared datasets`   
 
-        let stylesheet = this.getStylesheet()
-        delete stylesheet['services']
-        if (this.filters.source === this.filters.target)
-            stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} based on shared datasets`
-        else  stylesheet.appli.name = `Relationship between ${this.prettyTitle(this.filters.source)} and ${this.prettyTitle(this.filters.target)} based on shared datasets`   
-
-        return {
-            data: network,
-            stylesheet: stylesheet
+            return {
+                data: network,
+                stylesheet: stylesheet
+            }
+        } catch(e) {
+            return { message: `Data processing failed with error: ${e.message}`}
         }
         
     }
@@ -490,35 +503,39 @@ class DataTools {
 
         const network = []
 
-        for (const key of Object.keys(itemsDict)) { 
-            const itemList = itemsDict[key]
-            const arraySize = itemList.length;
-            // console.log(`Processing task ${key} (${currentTaskNumber}/${totalTasks}). Array size: ${arraySize}`);
+        try {
+            for (const key of Object.keys(itemsDict)) { 
+                const itemList = itemsDict[key]
+                const arraySize = itemList.length;
+                // console.log(`Processing task ${key} (${currentTaskNumber}/${totalTasks}). Array size: ${arraySize}`);
 
-            let authors = itemList.map(d => {
-                let dt = this.data.find(e => e._id === d); 
-                return dt ? dt.id : null
-            })
+                let authors = itemList.map(d => {
+                    let dt = this.data.find(e => e._id === d); 
+                    return dt ? dt.id : null
+                })
 
-            authors = authors.filter(d => d)
+                authors = authors.filter(d => d)
 
-            const value = {
-                p: { value: key },
-                author: { value: authors.join('--') },
-                label: { value: key }
-            };
-            network.push(value);
+                const value = {
+                    p: { value: key },
+                    author: { value: authors.join('--') },
+                    label: { value: key }
+                };
+                network.push(value);
 
 
-            currentTaskNumber++;
+                currentTaskNumber++;
 
-        }
+            }
 
-        let stylesheet = this.getStylesheet()
-        stylesheet.appli.name = `The relationship between datasets based on shared ${this.prettyTitle(this.filters.link)}`
-        return {
-            data: network,
-            stylesheet: stylesheet
+            let stylesheet = this.getStylesheet()
+            stylesheet.appli.name = `The relationship between datasets based on shared ${this.prettyTitle(this.filters.link)}`
+            return {
+                data: network,
+                stylesheet: stylesheet
+            } 
+        } catch(e) {
+            return { message: `Data processing failed with error: ${e.message}`}
         }
     }
 
