@@ -513,7 +513,8 @@ class DataTools {
                 const value = {
                     p: { value: key },
                     author: { value: authors.join('--') },
-                    label: { value: key }
+                    label: { value: key },
+                    url: this.filters.link === 'model' ? { value: `https://huggingface.co/${key}`} : null,
                 };
                 network.push(value);
 

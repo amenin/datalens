@@ -30,7 +30,8 @@ class DataViz{
                 this.component.disableView('mge-barchart')
             else this.component.enableView('mge-barchart')
 
-            this.component.resetDashboard()
+            //this.component.resetDashboard()
+            this.component.innerHTML = null
             this.togglePlaceholder(null)
 
             this.display(result)
